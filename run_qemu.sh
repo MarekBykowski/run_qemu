@@ -12,8 +12,8 @@ pmem_label_size=2  #in MiB
 pmem_final_size="$((pmem_size + pmem_label_size))"
 : "${qemu:=qemu-system-x86_64}"
 : "${gdb:=gdb}"
-: "${distro:=fedora}"
-: "${rev:=36}"
+: "${distro:=ubuntu}"
+: "${rev:=jammy}"
 : "${ndctl:=$(readlink -f ~/git/ndctl)}"
 mkosi_bin="mkosi"
 mkosi_opts=("-i" "-f")
@@ -229,10 +229,19 @@ process_options_logic()
 		qemu=~/git/qemu/x86_64-softmmu/qemu-system-x86_64
 		qemu_img=~/git/qemu/qemu-img
 		qmp=~/git/qemu/scripts/qmp/qmp-shell
+
+		# mb:
+		qemu=~/repos/qemu/build/x86_64-softmmu/qemu-system-x86_64
+		qemu_img=~/repos/qemu/buildqemu-img
+		qmp=/home/bykowmar/repos/qemu/scripts/qmp/qmp-shell
 		# upstream changed where binaries go recently
 		if [ ! -f "$qemu_img" ]; then
 			qemu=~/git/qemu/build/qemu-system-x86_64
 			qemu_img=~/git/qemu/build/qemu-img
+
+			# mb:
+			qemu=/home/bykowmar/repos/qemu/build/qemu-system-x86_64
+			qemu_img=/home/bykowmar/repos/qemu/build/qemu-img
 		fi
 		if [ ! -x "$qemu" ]; then
 			fail "expected to find $qemu"
@@ -664,7 +673,9 @@ make_rootfs()
 
 	# misc rootfs setup
 	mkdir -p mkosi.extra/root/.ssh
-	cp -L ~/.ssh/id_rsa.pub mkosi.extra/root/.ssh/authorized_keys
+	#cp -L ~/.ssh/id_rsa.pub mkosi.extra/root/.ssh/authorized_keys
+	# mb:
+	cp -L /home/bykowmar/.ssh/id_rsa.pub mkosi.extra/root/.ssh/authorized_keys
 	chmod -R go-rwx mkosi.extra/root
 
 	rootfs_script="${script_dir}/${distro}_rootfs.sh"
@@ -1087,6 +1098,7 @@ prepare_qcmd()
 		qcmd+=("-device" "cxl-type3,bus=hb1rp0,memdev=cxl-mem2,id=cxl-dev2,lsa=cxl-lsa2")
 		qcmd+=("-device" "cxl-type3,bus=hb1rp1,memdev=cxl-mem3,id=cxl-dev3,lsa=cxl-lsa3")
 
+		if [[ ! : ]]; then
 		# Finally, the CFMWS entries
 		declare -a cfmws_params
 		while read -r param; do cfmws_params+=("$param"); done <<- EOF
@@ -1100,6 +1112,7 @@ prepare_qcmd()
 			cxl-fmw.1.interleave-granularity=8k
 		EOF
 		qcmd+=("-M" "$(printf %s "${cfmws_params[@]}")")
+		fi
 	fi
 
 	if [[ $_arg_qmp == "on" ]]; then
@@ -1180,7 +1193,8 @@ start_qemu()
 		fi
 	fi
 	if [[ $_arg_timeout == "0" ]]; then
-		"${qcmd[@]}"
+		echo "${qcmd[@]}"
+		"${qcmd[@]}"  -writeconfig ~/log
 	else
 		printf "guest will be terminated after %d minute(s)\n" "$_arg_timeout"
 		"${qcmd[@]}" & sleep 5
