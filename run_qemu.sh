@@ -60,6 +60,7 @@ if [[ $qemu_dir != . ]]; then
 		qemu_img="$qemu_dir/build/qemu-img"
 	fi
 	qmp="$qemu_dir/scripts/qmp/qmp-shell"
+	qemu="$qemu_dir/build/"
 else
 	qemu_img="qemu-img"
 	qmp="qmp"
@@ -226,22 +227,14 @@ process_options_logic()
 		_arg_git_qemu="on"
 	fi
 	if [[ $_arg_git_qemu == "on" ]]; then
-		qemu=~/git/qemu/x86_64-softmmu/qemu-system-x86_64
-		qemu_img=~/git/qemu/qemu-img
-		qmp=~/git/qemu/scripts/qmp/qmp-shell
-
-		# mb:
-		qemu=~/repos/qemu/build/x86_64-softmmu/qemu-system-x86_64
-		qemu_img=~/repos/qemu/buildqemu-img
-		qmp=/home/bykowmar/repos/qemu/scripts/qmp/qmp-shell
+		qemu=${qemu_dir}/x86_64-softmmu/qemu-system-x86_64
+		qemu_img=${qemu_dir}/qemu-img
+		qmp=${qemu_dir}/scripts/qmp/qmp-shell
 		# upstream changed where binaries go recently
 		if [ ! -f "$qemu_img" ]; then
-			qemu=~/git/qemu/build/qemu-system-x86_64
-			qemu_img=~/git/qemu/build/qemu-img
-
-			# mb:
-			qemu=/home/bykowmar/repos/qemu/build/qemu-system-x86_64
-			qemu_img=/home/bykowmar/repos/qemu/build/qemu-img
+			qemu=${qemu_dir}/build/x86_64-softmmu/qemu-system-x86_64
+			qemu_img=${qemu_dir}/build/qemu-img
+			qmp=${qemu_dir}/scripts/qmp/qmp-shell
 		fi
 		if [ ! -x "$qemu" ]; then
 			fail "expected to find $qemu"
