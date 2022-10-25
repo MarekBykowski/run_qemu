@@ -455,7 +455,7 @@ update_rootfs_boot_kernel()
 	fi
 
 	# TODO: consolidate this with build_kernel_cmdline()
-	kopts=( 
+	kopts=(
 		"root=PARTUUID=$root_partuuid"
 		"selinux=0"
 		"audit=0"
@@ -858,7 +858,7 @@ options_from_file()
 build_kernel_cmdline()
 {
 	# standard options
-	kcmd=( 
+	kcmd=(
 		"selinux=0"
 		"audit=0"
 		"console=tty0"
@@ -868,7 +868,7 @@ build_kernel_cmdline()
 		"rw"
 	)
 	if [[ $_arg_cxl_debug == "on" ]]; then
-		kcmd+=( 
+		kcmd+=(
 			"cxl_acpi.dyndbg=+fplm"
 			"cxl_pci.dyndbg=+fplm"
 			"cxl_core.dyndbg=+fplm"
@@ -880,7 +880,7 @@ build_kernel_cmdline()
 		)
 	fi
 	if [[ $_arg_nfit_debug == "on" ]]; then
-		kcmd+=( 
+		kcmd+=(
 			"libnvdimm.dyndbg=+fplm"
 			"nfit.dyndbg=+fplm"
 			"nfit_test.dyndbg=+fplm"
@@ -891,7 +891,7 @@ build_kernel_cmdline()
 		)
 	fi
 	if [[ $_arg_nfit_test == "on" ]]; then
-		kcmd+=( 
+		kcmd+=(
 			"memmap=3G!6G,1G!9G"
 			"efi_fake_mem=2G@10G:0x40000"
 		)
@@ -1037,8 +1037,8 @@ prepare_qcmd()
 	[[ $mac_lower =~ (..)(..)(..) ]] && guestmac+=("${BASH_REMATCH[@]:1}")
 	mac_addr=$(IFS=:; echo "${guestmac[*]}")
 
-	qcmd+=("-device" "e1000,netdev=net0,mac=$mac_addr")
-	qcmd+=("-netdev" "user,id=net0,hostfwd=tcp::$hostport-:22")
+	#qcmd+=("-device" "e1000,netdev=net0,mac=$mac_addr")
+	#qcmd+=("-netdev" "user,id=net0,hostfwd=tcp::$hostport-:22")
 
 	if [[ $_arg_cxl_legacy == "on" ]]; then
 		# Create a single host bridge with a single root port, and a
@@ -1187,7 +1187,9 @@ start_qemu()
 	fi
 	if [[ $_arg_timeout == "0" ]]; then
 		echo "${qcmd[@]}"
-		"${qcmd[@]}"  -writeconfig ~/log
+		# writeconfig is obsolete and not supported any longer
+		#"${qcmd[@]}"  -writeconfig ~/log
+		"${qcmd[@]}"
 	else
 		printf "guest will be terminated after %d minute(s)\n" "$_arg_timeout"
 		"${qcmd[@]}" & sleep 5
