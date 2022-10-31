@@ -999,7 +999,7 @@ prepare_qcmd()
 	qcmd+=("$qemu")
 
 	# setup machine_args
-	machine_args=("q35" "accel=kvm")
+	machine_args=("q35")
 	if [[ "$num_pmems" -gt 0 ]]; then
 		machine_args+=("nvdimm=on")
 	fi
