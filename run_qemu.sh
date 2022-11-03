@@ -343,12 +343,14 @@ __build_kernel()
 		make -j"$num_build_cpus" M="$test_path"
 		make INSTALL_MOD_PATH="$inst_prefix" M="$test_path" modules_install
 	fi
+	: << 'EOF'
 	if (( _arg_quiet >= 1 )); then
 		install_build_initrd > /dev/null 2>&1
 	else
 		install_build_initrd
 	fi
 
+EOF
 	initrd="mkosi.extra/boot/initramfs-$kver.img"
 }
 
@@ -1256,12 +1258,14 @@ main()
 	case "$_arg_rebuild" in
 		kmod)
 			build_kernel
+			: << 'EOF'
 			if [ -s "$builddir/$_arg_rootfs" ]; then
 				update_existing_rootfs
 			else
 				make_rootfs
 			fi
 			update_rootfs_boot_kernel
+EOF
 			;;
 		wipe|clean)
 			test -d "$builddir" && sudo rm -rf $builddir/*
