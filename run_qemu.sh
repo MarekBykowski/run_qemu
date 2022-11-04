@@ -293,7 +293,8 @@ install_build_initrd()
 
 	make INSTALL_MOD_PATH="$inst_prefix" modules_install
 	make INSTALL_HDR_PATH="$inst_prefix/usr" headers_install
-	make INSTALL_PATH="$inst_path" INSTALL_MOD_PATH="$inst_prefix" INSTALL_HDR_PATH="$inst_prefix/usr" install
+	#mb: following requires root
+	#make INSTALL_PATH="$inst_path" INSTALL_MOD_PATH="$inst_prefix" INSTALL_HDR_PATH="$inst_prefix/usr" install
 
 	# Much of the script relies on a kernel named vmlinuz-$kver. This is
 	# distro specific as the default from Linux is simply "vmlinuz". Adjust
@@ -304,6 +305,7 @@ install_build_initrd()
 	# and it expects a /lib/modules/$kver/vmlinuz
 	cp "$inst_path/vmlinuz-$kver" "$inst_prefix/lib/modules/$kver/vmlinuz"
 
+	: <<- 'EOF'
 	dracut --force --verbose \
 		--no-hostonly \
 		--show-modules \
@@ -315,6 +317,7 @@ install_build_initrd()
 		--omit "iscsi fcoe fcoe-uefi" \
 		--omit-drivers "nfit libnvdimm nd_pmem" \
 		"$inst_path/initramfs-$kver.img"
+	EOF
 }
 
 __build_kernel()
@@ -343,14 +346,12 @@ __build_kernel()
 		make -j"$num_build_cpus" M="$test_path"
 		make INSTALL_MOD_PATH="$inst_prefix" M="$test_path" modules_install
 	fi
-	: << 'EOF'
 	if (( _arg_quiet >= 1 )); then
 		install_build_initrd > /dev/null 2>&1
 	else
 		install_build_initrd
 	fi
 
-EOF
 	initrd="mkosi.extra/boot/initramfs-$kver.img"
 }
 
@@ -965,7 +966,8 @@ prepare_qcmd()
 	if [ -n "$kver" ] && [ -e "mkosi.extra/boot/vmlinuz-$kver" ]; then
 		vmlinuz="mkosi.extra/boot/vmlinuz-$kver"
 	else
-		vmlinuz="$(find . -name "vmlinuz*" | grep -vE ".*\.old$" | tail -1)"
+		echo "mb: pwd `pwd`"
+		vmlinuz="$(find ./ -name "vmlinuz*" | grep -vE ".*\.old$" | tail -1)"
 	fi
 
 	# if a kver was specified, try to use the same initrd
@@ -1225,14 +1227,14 @@ main()
 	case "$_arg_rebuild" in
 		kmod)
 			build_kernel
-			: << 'EOF'
+			: <<- 'EOF'
 			if [ -s "$builddir/$_arg_rootfs" ]; then
 				update_existing_rootfs
 			else
 				make_rootfs
 			fi
 			update_rootfs_boot_kernel
-EOF
+			EOF
 			;;
 		wipe|clean)
 			test -d "$builddir" && sudo rm -rf $builddir/*
