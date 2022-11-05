@@ -293,8 +293,9 @@ install_build_initrd()
 
 	make INSTALL_MOD_PATH="$inst_prefix" modules_install
 	make INSTALL_HDR_PATH="$inst_prefix/usr" headers_install
-	#mb: following requires root
+	#mb: following requires root privileges, so silence it but yet we need vmlinuz
 	#make INSTALL_PATH="$inst_path" INSTALL_MOD_PATH="$inst_prefix" INSTALL_HDR_PATH="$inst_prefix/usr" install
+	cp arch/x86/boot/bzImage `pwd`/${inst_path:1}/vmlinuz-`make kernelrelease`
 
 	# Much of the script relies on a kernel named vmlinuz-$kver. This is
 	# distro specific as the default from Linux is simply "vmlinuz". Adjust
