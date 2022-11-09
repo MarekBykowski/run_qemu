@@ -668,7 +668,7 @@ make_rootfs()
 	mkdir -p mkosi.extra/root/.ssh
 	#cp -L ~/.ssh/id_rsa.pub mkosi.extra/root/.ssh/authorized_keys
 	# mb:
-	cp -L /home/bykowmar/.ssh/id_rsa.pub mkosi.extra/root/.ssh/authorized_keys
+	cp -L $HOME/.ssh/id_rsa.pub mkosi.extra/root/.ssh/authorized_keys
 	chmod -R go-rwx mkosi.extra/root
 
 	rootfs_script="${script_dir}/${distro}_rootfs.sh"
