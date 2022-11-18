@@ -475,6 +475,7 @@ update_rootfs_boot_kernel()
 		"nd_btt.dyndbg=+fplm"
 		"dax.dyndbg=+fplm"
 		"nfit_test_iomap.dyndbg=+fplm"
+		"ftrace=trace_printk"
 	)
 	sudo tee "$conffile" > /dev/null <<- EOF
 		title run-qemu-$distro ($kver)
@@ -1037,8 +1038,8 @@ prepare_qcmd()
 	[[ $mac_lower =~ (..)(..)(..) ]] && guestmac+=("${BASH_REMATCH[@]:1}")
 	mac_addr=$(IFS=:; echo "${guestmac[*]}")
 
-	#qcmd+=("-device" "e1000,netdev=net0,mac=$mac_addr")
-	#qcmd+=("-netdev" "user,id=net0,hostfwd=tcp::$hostport-:22")
+	qcmd+=("-device" "e1000,netdev=net0,mac=$mac_addr")
+	qcmd+=("-netdev" "user,id=net0,hostfwd=tcp::$hostport-:22")
 
 	if [[ $_arg_cxl_legacy == "on" ]]; then
 		# Create a single host bridge with a single root port, and a
