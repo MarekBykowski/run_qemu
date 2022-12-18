@@ -867,6 +867,7 @@ build_kernel_cmdline()
 		"root=/dev/sda2"
 		"ignore_loglevel"
 		"rw"
+		"bootconfig"
 	)
 	if [[ $_arg_cxl_debug == "on" ]]; then
 		kcmd+=(
@@ -928,7 +929,14 @@ get_ovmf_binaries()
 		return 0
 	fi
 
-	tar -I zstd --strip-components=4 -xf edk2-ovmf.tar.zst usr/share/edk2-ovmf/x64/OVMF_CODE.fd usr/share/edk2-ovmf/x64/OVMF_VARS.fd
+	kv=$(make -C ../ kernelversion)
+	if [[ $kv =~ 5.19 ]]; then
+		echo going with 5.19 kernel version
+		tar -I zstd --strip-components=4 -xf edk2-ovmf.tar.zst usr/share/edk2/x64/OVMF_CODE.fd usr/share/edk2/x64/OVMF_VARS.fd
+	else
+		echo ging with any other kernel version
+		tar -I zstd --strip-components=4 -xf edk2-ovmf.tar.zst usr/share/edk2-ovmf/x64/OVMF_CODE.fd usr/share/edk2-ovmf/x64/OVMF_VARS.fd
+	fi
 }
 
 setup_nvme()
