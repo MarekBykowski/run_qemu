@@ -973,7 +973,7 @@ prepare_qcmd()
 
 	pushd "$builddir" > /dev/null || exit 1
 
-	get_ovmf_binaries
+	#get_ovmf_binaries
 
 	if [[ ! $kver ]] && [[ $_arg_kver ]]; then
 		kver="$_arg_kver"
