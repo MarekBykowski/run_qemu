@@ -1009,8 +1009,8 @@ prepare_qcmd()
 
 	# cpu topology: num_nodes sockets, 2 cores per socket, 2 threads per core
 	# so smp = num_nodes (sockets) * cores * threads
-	cores=2
-	threads=2
+	cores=4
+	threads=1
 	sockets=$num_nodes
 	smp=$((sockets * cores * threads))
 
@@ -1299,7 +1299,22 @@ main()
 
 	prepare_qcmd
 	if [[ $_arg_run == "on" ]]; then
-		start_qemu
+		if [[ ! : ]]; then
+			start_qemu
+		else
+			# Start qemu with my args
+			$qemu \
+				  -machine q35,nvdimm=on,cxl=on \
+				  -m 8192M,maxmem=40960M \
+				  -smp 8 \
+				  -nographic \
+				  -serial mon:stdio \
+				  -drive file=qbuild/root.img,format=raw \
+				  -kernel qbuild/mkosi.extra/boot/vmlinuz-6.1.0-rc4+ \
+				  -initrd qbuild/mkosi.extra/boot/initramfs-6.1.0-rc4+.img \
+				  -append "console=ttyS0 root=/dev/sda2 rw nokaslr ignore_loglevel"
+
+		fi
 	fi
 	if [[ $_arg_post_script ]]; then
 		# This is the last thing that runs so that the script's exit
