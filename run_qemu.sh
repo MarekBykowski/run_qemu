@@ -1312,7 +1312,8 @@ main()
 				  -drive file=qbuild/root.img,format=raw \
 				  -kernel qbuild/mkosi.extra/boot/vmlinuz-6.1.0-rc4+ \
 				  -initrd qbuild/mkosi.extra/boot/initramfs-6.1.0-rc4+.img \
-				  -append "console=ttyS0 root=/dev/sda2 rw nokaslr ignore_loglevel"
+				   -nic user,model=virtio-net-pci,hostfwd=tcp::3333-:22 \
+				  -append "console=ttyS0 root=/dev/sda2 ip=dhcp rw nokaslr ignore_loglevel"
 
 		fi
 	fi
